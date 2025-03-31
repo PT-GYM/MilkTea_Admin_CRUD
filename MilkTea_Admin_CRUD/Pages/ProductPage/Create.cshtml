@@ -1,0 +1,38 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.ProductPage.CreateModel
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<h2>Create New Product</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="Product.Name" class="form-label">Product Name</label>
+        <input asp-for="Product.Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.Price" class="form-label">Price</label>
+        <input asp-for="Product.Price" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.Stock" class="form-label">Stock</label>
+        <input asp-for="Product.Stock" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.CategoryId" class="form-label">Category</label>
+        <select asp-for="Product.CategoryId" asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))" class="form-select" required>
+            <option value="">-- Select Category --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Upload Product Image</label>
+        <input type="file" asp-for="ProductImage" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

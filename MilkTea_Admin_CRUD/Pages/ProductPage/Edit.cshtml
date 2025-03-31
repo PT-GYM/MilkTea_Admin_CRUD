@@ -1,0 +1,51 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.ProductPage.EditModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h2>Edit Product</h2>
+
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Product.ProductId" />
+
+    <div class="mb-3">
+        <label asp-for="Product.Name" class="form-label">Product Name</label>
+        <input asp-for="Product.Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.Price" class="form-label">Price</label>
+        <input asp-for="Product.Price" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.CategoryId" class="form-label">Category</label>
+        <select asp-for="Product.CategoryId" asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))" class="form-select" required>
+            <option value="">-- Select Category --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Current Product Image</label>
+        @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
+        {
+            <div>
+                <img src="@Model.Product.ImageUrl" alt="Product Image" style="max-width: 200px; max-height: 200px;">
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.Stock" class="form-label">Stock</label>
+        <input asp-for="Product.Stock" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3"> 
+        <label class="form-label">Upload New Image</label>
+        <input type="file" asp-for="ProductImage" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>

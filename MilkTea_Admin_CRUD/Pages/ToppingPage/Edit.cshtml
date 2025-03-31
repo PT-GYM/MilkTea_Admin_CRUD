@@ -1,0 +1,42 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.ToppingPage.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Topping.ToppingId" />
+
+    <div class="mb-3">
+        <label asp-for="Topping.Name" class="form-label">Topping Name</label>
+        <input asp-for="Topping.Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Topping.Price" class="form-label">Price</label>
+        <input asp-for="Topping.Price" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Current Topping Image</label>
+        @if (!string.IsNullOrEmpty(Model.Topping.ImageUrl))
+        {
+            <div>
+                <img src="@Model.Topping.ImageUrl" alt="Product Image" style="max-width: 200px; max-height: 200px;">
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Topping.Stock" class="form-label">Stock</label>
+        <input asp-for="Topping.Stock" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Upload New Image</label>
+        <input type="file" asp-for="ToppingImage" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>

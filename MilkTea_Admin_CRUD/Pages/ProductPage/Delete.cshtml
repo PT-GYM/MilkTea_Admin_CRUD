@@ -1,0 +1,38 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.ProductPage.DeleteModel
+@{
+    ViewData["Title"] = "Xóa Sản Phẩm";
+}
+
+<h2>Xóa Sản Phẩm</h2>
+
+@if (Model.ProductId == null || Model.ProductId <= 0)
+{
+    <p class="text-danger">Không tìm thấy sản phẩm để xóa.</p>
+}
+else
+{
+    <form method="post">
+        <input type="hidden" asp-for="ProductId" />
+        <p>Bạn có chắc chắn muốn xóa sản phẩm có ID <strong>@Model.ProductId</strong> không?</p>
+
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a asp-page="./Show" class="btn btn-secondary">Hủy</a>
+    </form>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.9/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/productHub") // Đảm bảo tên Hub đúng với server
+            .build();
+
+        connection.start().catch(err => console.error("Lỗi kết nối SignalR:", err));
+
+        connection.on("ProductDeleted", function(id) {
+            alert("Sản phẩm có ID " + id + " đã bị xóa!");
+            window.location.href = "./Show";
+        });
+    </script>
+}
