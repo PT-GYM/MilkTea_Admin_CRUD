@@ -9,7 +9,7 @@ using BussinessObject;
 using Repository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Services;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.ToppingPage
 {
@@ -17,9 +17,9 @@ namespace MilkTea_Admin_CRUD.Pages.ToppingPage
     public class IndexModel : PageModel
     {
         private readonly IToppingService _toppingService;
-        private readonly ICategory _category;
+        private readonly ICategoryService _category;
 
-        public IndexModel(IToppingService toppingService, ICategory category)
+        public IndexModel(IToppingService toppingService, ICategoryService category)
         {
             _toppingService = toppingService;
             _category = category;

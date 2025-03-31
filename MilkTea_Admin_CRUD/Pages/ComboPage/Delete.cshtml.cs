@@ -6,15 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using BussinessObject;
-using Repository;
 
 namespace MilkTea_Admin_CRUD.Pages.ComboPage
 {
     public class DeleteModel : PageModel
     {
-        private readonly Repository.MilkTeaShopContext _context;
+        private readonly BussinessObject.MilkTeaShopContext _context;
 
-        public DeleteModel(Repository.MilkTeaShopContext context)
+        public DeleteModel(BussinessObject.MilkTeaShopContext context)
         {
             _context = context;
         }

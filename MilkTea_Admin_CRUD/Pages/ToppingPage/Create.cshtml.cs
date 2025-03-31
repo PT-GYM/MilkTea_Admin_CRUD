@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BussinessObject;
 using Repository;
-using Services;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.ToppingPage
 {

@@ -7,15 +7,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BussinessObject;
-using Repository;
 
 namespace MilkTea_Admin_CRUD.Pages.ComboPage
 {
     public class EditModel : PageModel
     {
-        private readonly Repository.MilkTeaShopContext _context;
+        private readonly BussinessObject.MilkTeaShopContext _context;
 
-        public EditModel(Repository.MilkTeaShopContext context)
+        public EditModel(BussinessObject.MilkTeaShopContext context)
         {
             _context = context;
         }
@@ -36,6 +35,10 @@ namespace MilkTea_Admin_CRUD.Pages.ComboPage
                 return NotFound();
             }
             Combo = combo;
+           ViewData["Product1Id"] = new SelectList(_context.Products, "ProductId", "Name");
+           ViewData["Product2Id"] = new SelectList(_context.Products, "ProductId", "Name");
+           ViewData["Topping1Id"] = new SelectList(_context.Toppings, "ToppingId", "Name");
+           ViewData["Topping2Id"] = new SelectList(_context.Toppings, "ToppingId", "Name");
             return Page();
         }
 

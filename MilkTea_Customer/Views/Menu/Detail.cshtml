@@ -1,0 +1,123 @@
+﻿@model BussinessObject.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    var toppings = ViewBag.Toppings as List<BussinessObject.Topping>;
+}
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="@Model.Name">
+        </div>
+        <div class="col-md-6">
+            <h2>@Model.Name</h2>
+            <p><strong>Giá:</strong> @Model.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</p>
+            <p><strong>Kho hàng:</strong> @Model.Stock</p>
+
+            <form method="post" id="productForm">
+                <h4>Chọn tối đa 2 topping (không bắt buộc):</h4>
+                <div class="form-group">
+                    @foreach (var topping in toppings)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input topping-checkbox" name="selectedToppings" value="@topping.ToppingId" id="topping_@topping.ToppingId">
+                            <label class="form-check-label" for="topping_@topping.ToppingId">
+                                <img src="@topping.ImageUrl" style="width: 30px; height: 30px; object-fit: cover;">
+                                @topping.Name - @topping.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND
+                            </label>
+                        </div>
+                    }
+                </div>
+
+                <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#checkoutModal">Checkout</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for checkout -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkoutModalLabel">Thông tin đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="phoneNumber">Số điện thoại</label>
+                        <input type="text" class="form-control" id="phoneNumber" name="PhoneNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Địa chỉ</label>
+                        <input type="text" class="form-control" id="address" name="Address" required>
+                    </div>
+                    <div>
+                        <input type="hidden" name="ProductId" value="@Model.ProductId">
+                        <input type="hidden" name="ToppingIds" id="toppingIds">
+                        <div class="form-group">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+       document.addEventListener("DOMContentLoaded", function () {
+        // Lấy các topping đã chọn
+        let checkboxes = document.querySelectorAll(".topping-checkbox");
+        let toppingIds = [];
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                let checked = document.querySelectorAll(".topping-checkbox:checked");
+                if (checked.length > 2) {
+                    this.checked = false;
+                }
+                toppingIds = Array.from(checked).map(checkbox => checkbox.value);
+                document.getElementById("toppingIds").value = toppingIds.join(',');
+            });
+        });
+
+        // Sự kiện bấm nút checkout
+        document.querySelector(".btn-primary.mt-3").addEventListener("click", function () {
+            $('#checkoutModal').modal('show');
+        });
+
+        document.getElementById("checkoutForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let phoneNumber = document.getElementById("phoneNumber").value;
+            let address = document.getElementById("address").value;
+            let toppingIds = document.getElementById("toppingIds").value;
+
+            $.ajax({
+                type: "POST",
+                url: "/Menu/ConfirmOrder",
+                data: {
+                    phoneNumber: phoneNumber,
+                    address: address,
+                    productId: document.querySelector("input[name='ProductId']").value,
+                    toppingIds: toppingIds
+                },
+                success: function (response) {
+                    alert("Đơn hàng đã được tạo thành công!");
+                    $('#checkoutModal').modal('hide');
+                },
+                error: function (error) {
+                    alert("Có lỗi xảy ra, vui lòng thử lại.");
+                }
+            });
+        });
+    });
+
+</script>

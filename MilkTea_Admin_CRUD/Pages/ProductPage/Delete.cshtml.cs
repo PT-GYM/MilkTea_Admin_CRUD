@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using MilkTea_Admin_CRUD.Hubs;
-using Services;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.ProductPage
 {

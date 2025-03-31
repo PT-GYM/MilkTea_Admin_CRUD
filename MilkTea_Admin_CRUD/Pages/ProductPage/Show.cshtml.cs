@@ -2,13 +2,13 @@ using BussinessObject;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.ProductPage
 {
@@ -16,9 +16,9 @@ namespace MilkTea_Admin_CRUD.Pages.ProductPage
     public class ShowModel : PageModel
     {
         private readonly IProductService _productService;
-        private readonly ICategory _category;
+        private readonly ICategoryService _category;
 
-        public ShowModel(IProductService productService, ICategory category)
+        public ShowModel(IProductService productService, ICategoryService category)
         {
             _productService = productService;
             _category = category;

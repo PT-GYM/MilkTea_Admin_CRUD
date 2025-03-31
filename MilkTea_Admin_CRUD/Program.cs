@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using BussinessObject;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MilkTea_Admin_CRUD.Hubs;
+using MilkTea_Admin_CRUD.Service;
 using Repository;
 using Repository.UnitOfWorks;
-using Services;
+using Services.Interface;
+using Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 // Thêm DbContext
@@ -23,16 +26,18 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 
+
 // Thêm các dịch vụ
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddSession();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IAccount, Account>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IComboService, ComboService>();
 builder.Services.AddScoped<IToppingService, ToppingService>();
-builder.Services.AddScoped<ICategory, CategoryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IComboService, ComboService>();
+builder.Services.AddScoped<IHubService, HubService>();
 
 var app = builder.Build();
 
@@ -43,13 +48,29 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/Authen/Login");
+        return;
+    }
+    await next();
+});
+
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();   
 app.UseRouting();
-app.UseSession();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+    endpoints.MapHub<ProductHub>("/productHub"); 
+});
+
 app.UseAuthentication();  
 app.UseAuthorization();
-app.MapHub<ProductHub>("/productHub");
+
 
 app.MapRazorPages();
 app.Run();

@@ -20,6 +20,10 @@ namespace Repository.UnitOfWorks
         public IGenericRepository<Combo> combo { get; }
         public IGenericRepository<Category> category { get; }
 
+        public IGenericRepository<Order> order { get; }
+
+        public IGenericRepository<OrderDetail> orderDetail { get; }
+
         public UnitOfWork(MilkTeaShopContext context)
         {
             _context = context;
@@ -28,6 +32,8 @@ namespace Repository.UnitOfWorks
             combo = new GenericRepository<Combo>(_context);
             topping = new GenericRepository<Topping>(_context);
             category = new GenericRepository<Category>(_context);
+            order = new GenericRepository<Order>(_context);
+            orderDetail = new GenericRepository<OrderDetail>(_context);
         }
 
         public void Dispose()

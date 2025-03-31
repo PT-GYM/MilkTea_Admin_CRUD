@@ -3,17 +3,17 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Services;
 using System.Security.Claims;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.Authen
 {
     [BindProperties]
     public class LoginModel : PageModel
     {
-        private readonly IAccount _accountService;
+        private readonly IAccountService _accountService;
 
-        public LoginModel(IAccount accountService)
+        public LoginModel(IAccountService accountService)
         {
             _accountService = accountService;
         }
@@ -56,7 +56,6 @@ namespace MilkTea_Admin_CRUD.Pages.Authen
 
             HttpContext.Session.SetString("UserEmail", acc.Username);
             HttpContext.Session.SetString("Role", acc.Role);
-            HttpContext.Session.SetString("UserPassword", acc.Password);
 
 
             return RedirectToPage("/ProductPage/Show");

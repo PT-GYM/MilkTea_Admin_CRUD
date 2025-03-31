@@ -1,16 +1,16 @@
 using BussinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Services;
+using Services.Interface;
 
 namespace MilkTea_Admin_CRUD.Pages.ProductPage
 {
     public class EditModel : PageModel
     {
         private readonly IProductService _productService;
-        private readonly ICategory _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public EditModel(IProductService productService, ICategory categoryService)
+        public EditModel(IProductService productService, ICategoryService categoryService)
         {
             _productService = productService;
             _categoryService = categoryService;

@@ -15,6 +15,8 @@ namespace Repository.UnitOfWorks
         IGenericRepository<Topping> topping { get; }
         IGenericRepository<Combo> combo { get; }
         IGenericRepository<Category> category { get; }
+        IGenericRepository<Order> order { get; }
+        IGenericRepository<OrderDetail> orderDetail { get; }
         Task<int> SaveAsync();
     }
 }
