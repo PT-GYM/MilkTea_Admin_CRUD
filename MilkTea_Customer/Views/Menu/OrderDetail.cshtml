@@ -1,0 +1,37 @@
+﻿@model IEnumerable<BussinessObject.OrderDetail>
+
+<h2>Chi tiết đơn hàng</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Topping</th>
+            <th>Số lượng</th>
+            <th>Giá sản phẩm</th>
+            <th>Tổng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detail in Model)
+        {
+            <tr>
+                <td>@detail.Product.Name</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(detail.ToppingIds))
+                    {
+                        var toppingDetails = ViewBag.ToppingDetails[detail.ToppingIds];
+                        @toppingDetails
+                    }
+                    else
+                    {
+                        <span>Không có topping</span>
+                    }
+                </td>
+                <td>@detail.Quantity</td>
+                <td>@detail.Product.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+                <td>@detail.SubTotal.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+            </tr>
+        }
+    </tbody>
+</table>

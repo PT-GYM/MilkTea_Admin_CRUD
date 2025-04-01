@@ -1,5 +1,4 @@
-﻿
-using BussinessObject;
+﻿using BussinessObject;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 using Services.Service;
@@ -81,6 +80,7 @@ namespace MilkTea_Customer.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ConfirmOrder(string phoneNumber, string address, int productId, string toppingIds)
         {
             var product = await _productService.GetProductByIdAsync(productId);
@@ -89,17 +89,15 @@ namespace MilkTea_Customer.Controllers
                 return NotFound();
             }
 
-            // Lấy UserId từ session
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                return Unauthorized(); // Hoặc xử lý khi UserId không tồn tại trong session
+                return Unauthorized();
             }
 
             List<Topping> toppings = new List<Topping>();
             decimal toppingTotal = 0;
 
-            // Nếu có toppingIds, phân tách và lấy thông tin các topping
             if (!string.IsNullOrEmpty(toppingIds))
             {
                 var toppingIdList = toppingIds.Split(',')
@@ -112,15 +110,38 @@ namespace MilkTea_Customer.Controllers
                                               .ToList();
 
                 toppings = await _toppingService.GetToppingByIdsAsync(toppingIdList);
-                toppingTotal = toppings.Sum(t => t.Price); // Tính tổng giá trị topping
+                toppingTotal = toppings.Sum(t => t.Price);
             }
 
-            decimal totalAmount = product.Price + toppingTotal; // Tổng tiền cho sản phẩm + topping
+            decimal totalAmount = product.Price + toppingTotal;
 
-            // Tạo đơn hàng
+            // Trừ stock của sản phẩm
+            if (product.Stock <= 0)
+            {
+                return BadRequest("Sản phẩm đã hết hàng");
+            }
+            product.Stock -= 1;  // Giảm 1 đơn vị sản phẩm
+
+            // Trừ stock của topping
+            foreach (var topping in toppings)
+            {
+                if (topping.Stock <= 0)
+                {
+                    return BadRequest($"Topping {topping.Name} đã hết hàng");
+                }
+                topping.Stock -= 1;  // Giảm 1 đơn vị topping
+            }
+
+            // Lưu lại thông tin vào DB
+            await _productService.UpdateProductAsync(product); // Cập nhật stock sản phẩm
+            foreach (var topping in toppings)
+            {
+                await _toppingService.UpdateToppingAsync(topping); // Cập nhật stock topping
+            }
+
             var order = new Order
             {
-                UserId = userId.Value, // Gán UserId từ session
+                UserId = userId.Value,
                 PhoneNumber = phoneNumber,
                 Address = address,
                 TotalAmount = totalAmount,
@@ -128,11 +149,10 @@ namespace MilkTea_Customer.Controllers
                 OrderDate = DateTime.Now
             };
 
-            // Tạo OrderDetail cho sản phẩm và tất cả topping
             var orderDetail = new OrderDetail
             {
                 ProductId = productId,
-                ToppingIds = string.Join(",", toppings.Select(t => t.ToppingId)), // Lưu tất cả topping dưới dạng chuỗi
+                ToppingIds = string.Join(",", toppings.Select(t => t.ToppingId)),
                 Quantity = 1,
                 SubTotal = product.Price + toppingTotal
             };
@@ -142,10 +162,60 @@ namespace MilkTea_Customer.Controllers
             return RedirectToAction("OrderConfirmation");
         }
 
-
         public async Task<IActionResult> OrderConfirmation()
         {
             return View();
         }
+
+        public async Task<IActionResult> Order()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var orders = await _orderService.GetOrdersByUserId(userId.Value);
+            return View(orders);
+        }
+
+        public async Task<IActionResult> OrderDetail(int orderId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var orderDetails = await _orderDetailService.GetOrderDetailsByOrderId(orderId);
+            if (orderDetails == null || !orderDetails.Any())
+            {
+                return NotFound();
+            }
+
+            var toppingDetailsDict = new Dictionary<string, string>();
+
+            foreach (var detail in orderDetails)
+            {
+                if (!string.IsNullOrEmpty(detail.ToppingIds))
+                {
+                    var toppingIdList = detail.ToppingIds.Split(',')
+                        .Select(id => int.TryParse(id, out int tid) ? tid : (int?)null)
+                        .Where(id => id.HasValue)
+                        .Select(id => id.Value)
+                        .ToList();
+
+                    var toppings = await _toppingService.GetToppingByIdsAsync(toppingIdList);
+                    var toppingDetails = string.Join(", ", toppings.Select(t => $"{t.Name} ({t.Price:N0} VND)"));
+
+                    toppingDetailsDict[detail.ToppingIds] = toppingDetails;
+                }
+            }
+
+            ViewBag.ToppingDetails = toppingDetailsDict;
+
+            return View(orderDetails);
+        }
+
     }
 }

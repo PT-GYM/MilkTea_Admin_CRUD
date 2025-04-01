@@ -23,8 +23,29 @@ namespace Services.Service
 
         public async Task<List<OrderDetail>> GetOrderDetailsByOrderId(int orderId)
         {
-            var orderDetails = await _unitOfWork.orderDetail.GetAsync(od => od.OrderId == orderId); 
-            return orderDetails.ToList(); 
+            var orderDetails = await _unitOfWork.orderDetail.GetAsync(
+                od => od.OrderId == orderId,
+                includeProperties: "Product"
+            );
+
+            foreach (var detail in orderDetails)
+            {
+                if (!string.IsNullOrEmpty(detail.ToppingIds))
+                {
+                    var toppingIds = detail.ToppingIds.Split(',')
+                        .Select(id => int.TryParse(id, out int tid) ? tid : (int?)null)
+                        .Where(tid => tid.HasValue)
+                        .Select(tid => tid.Value)
+                        .ToList();
+
+                    var toppings = await _unitOfWork.topping.GetAsync(t => toppingIds.Contains(t.ToppingId));
+                    detail.Toppings = toppings.ToList(); 
+                }
+            }
+
+            return orderDetails.ToList();
         }
+
+
     }
 }

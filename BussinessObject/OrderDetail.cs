@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BussinessObject;
 
@@ -24,4 +25,7 @@ public partial class OrderDetail
     public virtual Order? Order { get; set; }
 
     public virtual Product? Product { get; set; }
+
+    [NotMapped] 
+    public List<Topping> Toppings { get; set; } = new List<Topping>();
 }

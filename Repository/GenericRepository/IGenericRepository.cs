@@ -15,8 +15,6 @@ using System.Text;
         void Update(T entity);
         void Delete(T entity);
         IQueryable<T> Query();
-        Task<IEnumerable<T>> GetAsync(
-            Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null);
+        Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "");
     }
     }

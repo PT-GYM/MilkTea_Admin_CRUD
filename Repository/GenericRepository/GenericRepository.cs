@@ -30,9 +30,7 @@ namespace Repository.GenericRepository
 
         public IQueryable<T> Query() => _dbSet.AsQueryable();
 
-        public async Task<IEnumerable<T>> GetAsync(
-            Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
+        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "")
         {
             IQueryable<T> query = _dbSet;
 
@@ -41,9 +39,9 @@ namespace Repository.GenericRepository
                 query = query.Where(filter);
             }
 
-            if (orderBy != null)
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                query = orderBy(query);
+                query = query.Include(includeProperty);
             }
 
             return await query.ToListAsync();

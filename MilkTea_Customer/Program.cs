@@ -1,5 +1,6 @@
 using BussinessObject;
 using Microsoft.EntityFrameworkCore;
+using MilkTea_Customer.Hubs;
 using MilkTea_Customer.Service;
 using Repository.UnitOfWorks;
 using Services.Interface;
@@ -42,7 +43,10 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ProductHub>("/productHub");
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
