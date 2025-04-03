@@ -38,6 +38,9 @@ builder.Services.AddScoped<IToppingService, ToppingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IComboService, ComboService>();
 builder.Services.AddScoped<IHubService, HubService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+
 
 var app = builder.Build();
 

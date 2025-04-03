@@ -9,6 +9,9 @@ namespace Services.Interface
         Task CreateOrder(Order order, List<OrderDetail> orderDetails);  
         Task<Order> GetOrderById(int orderId);  
         Task<List<Order>> GetOrdersByUserId(int userId);  
-        Task UpdateOrderStatus(int orderId, string status);  
+        Task UpdateOrderStatus(int orderId, string status);
+        Task<List<Order>> GetAllOrdersSortedByDate();
+        Task<List<string>> GetOrderStatuses();
+
     }
 }

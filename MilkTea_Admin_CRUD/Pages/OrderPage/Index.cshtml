@@ -1,0 +1,95 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.OrderPage.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Order List</h1>
+
+<p>
+    <a asp-page="/ProductPage/Show" class="btn btn-secondary">Back To Products</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã đơn hàng</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Chi tiết</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model.Orders)
+        {
+            <tr>
+                <td>
+                    <a asp-page="Detail" asp-route-orderId="@order.OrderId">@order.OrderId</a>
+                </td>
+                <td>@order.PhoneNumber</td>
+                <td>@order.Address</td>
+                <td>@order.OrderDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@order.TotalAmount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+                <td>
+                    <form method="post" id="statusForm-@order.OrderId">
+                        <input type="hidden" name="OrderId" value="@order.OrderId" />
+                        <select name="NewStatus" class="form-select"
+                                onchange="handleStatusChange(@order.OrderId, '@order.Status}', this.value)">
+                            @foreach (var status in Model.OrderStatuses)
+                            {
+                                <option value="@status" selected="@(order.Status == status ? "selected" : null)">@status</option>
+                            }
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    <a asp-page="/OrderPage/OrderDetail" asp-route-orderId="@order.OrderId" class="btn btn-info">
+                        Xem chi tiết
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Modal xác nhận -->
+<div id="confirmModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận thay đổi trạng thái</h5>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" id="confirmForm">
+                    <input type="hidden" name="OrderId" id="confirmOrderId" />
+                    <input type="hidden" name="NewStatus" id="confirmNewStatus" />
+                    <button type="submit" class="btn btn-success">Đồng ý</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleStatusChange(orderId, currentStatus, newStatus) {
+        if (!newStatus || currentStatus === newStatus) return; 
+
+        // Cập nhật thông tin trong modal
+        document.getElementById("confirmOrderId").value = orderId;
+        document.getElementById("confirmNewStatus").value = newStatus;
+        document.getElementById("confirmMessage").innerHTML =
+            `Do you want to update this order status?`;
+
+        // Hiển thị modal xác nhận
+        var myModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        myModal.show();
+    }
+</script>

@@ -12,6 +12,8 @@ else
         <thead>
             <tr>
                 <th>Mã đơn hàng</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
                 <th>Trạng thái</th>
@@ -27,6 +29,8 @@ else
                             @order.OrderId
                         </a>
                     </td>
+                    <td>@order.PhoneNumber</td>
+                    <td>@order.Address</td>
                     <td>@order.OrderDate</td>
                     <td>@order.TotalAmount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
                     <td>@order.Status</td>
@@ -40,4 +44,3 @@ else
         </tbody>
     </table>
 }
-

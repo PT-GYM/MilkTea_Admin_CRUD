@@ -1,4 +1,5 @@
 ﻿using BussinessObject;
+using Microsoft.EntityFrameworkCore;
 using Repository.UnitOfWorks;
 using Services.Interface;
 using System;
@@ -51,5 +52,18 @@ namespace Services.Service
                 await _unitOfWork.SaveAsync();  
             }
         }
+
+        public async Task<List<Order>> GetAllOrdersSortedByDate()
+        {
+            return (await _unitOfWork.order.GetAsync(null))
+                .OrderByDescending(o => o.OrderDate) 
+                .ToList();
+        }
+
+        public async Task<List<string>> GetOrderStatuses()
+        {
+            return await Task.FromResult(new List<string> { "Pending", "Confirmed", "Canceled" });
+        }
+
     }
 }

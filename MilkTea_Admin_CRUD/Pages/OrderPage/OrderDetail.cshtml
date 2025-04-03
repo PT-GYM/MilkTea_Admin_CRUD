@@ -1,0 +1,36 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.OrderPage.OrderDetailModel
+
+@{
+    ViewData["Title"] = "Order Detail";
+}
+
+<h2>Order Detail</h2>
+
+<p>
+    <a asp-page="/OrderPage/Index" class="btn btn-secondary">Back To Orders</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Topping</th>
+            <th>Số lượng</th>
+            <th>Giá sản phẩm</th>
+            <th>Tổng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detail in Model.OrderDetails)
+        {
+            <tr>
+                <td>@detail.Product.Name</td>
+                <td>@Model.ToppingDetails[detail.OrderDetailId]</td>
+                <td>@detail.Quantity</td>
+                <td>@detail.Product.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+                <td>@detail.SubTotal.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+            </tr>
+        }
+    </tbody>
+</table>
