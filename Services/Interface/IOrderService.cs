@@ -12,6 +12,7 @@ namespace Services.Interface
         Task UpdateOrderStatus(int orderId, string status);
         Task<List<Order>> GetAllOrdersSortedByDate();
         Task<List<string>> GetOrderStatuses();
+        Task<bool> ConfirmOrderAsync(string phoneNumber, string address, int productId, string toppingIds, int userId);
 
     }
 }

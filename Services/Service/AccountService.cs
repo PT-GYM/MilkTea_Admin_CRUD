@@ -2,10 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Repository.UnitOfWorks;
 using Services.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Service
@@ -21,7 +17,24 @@ namespace Services.Service
 
         public async Task<User> Login(string username, string password)
         {
-            return await _unitOfWork.account.Query().FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
+            return await _unitOfWork.account.Query()
+                .FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
+        }
+
+        public async Task<bool> Register(User user)
+        {
+           
+            var existingUser = await _unitOfWork.account.Query()
+                .AnyAsync(x => x.Username == user.Username);
+
+            if (existingUser)
+            {
+                return false;
+            }
+
+            await _unitOfWork.account.AddAsync(user);
+            await _unitOfWork.SaveAsync();
+            return true;
         }
     }
 }

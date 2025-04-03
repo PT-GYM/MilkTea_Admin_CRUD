@@ -84,6 +84,23 @@ namespace Services.Service
             await _hubNoti.NotiProDeleted(id);
         }
 
+        public async Task<List<Product>> GetProductByIdsAsync(List<int> productIds)
+        {
+            var product = await _unitOfWork.product.GetAsync(t => productIds.Contains(t.ProductId));
+            return product.ToList();
+        }
+
+        public async Task<bool> CheckAndUpdateProductStockAsync(Product product, int quantity = 1)
+        {
+            if (product.Stock < quantity)
+            {
+                return false; 
+            }
+
+            product.Stock -= quantity;
+            await UpdateProductAsync(product); 
+            return true;
+        }
     }
 }
 

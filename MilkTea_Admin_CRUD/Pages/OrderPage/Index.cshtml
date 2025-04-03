@@ -7,14 +7,13 @@
 
 <h1>Order List</h1>
 
-<p>
-    <a asp-page="/ProductPage/Show" class="btn btn-secondary">Back To Products</a>
-</p>
+
 
 <table class="table">
     <thead>
         <tr>
             <th>Mã đơn hàng</th>
+            <th>Khách hàng</th>
             <th>Số điện thoại</th>
             <th>Địa chỉ</th>
             <th>Ngày đặt</th>
@@ -30,6 +29,7 @@
                 <td>
                     <a asp-page="Detail" asp-route-orderId="@order.OrderId">@order.OrderId</a>
                 </td>
+                <td>@order.User.Username</td>
                 <td>@order.PhoneNumber</td>
                 <td>@order.Address</td>
                 <td>@order.OrderDate?.ToString("dd/MM/yyyy HH:mm")</td>

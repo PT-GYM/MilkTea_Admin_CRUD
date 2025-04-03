@@ -15,5 +15,6 @@ namespace Services.Interface
         Task UpdateToppingAsync(Topping topping);
         Task DeleteToppingAsync(int id);
         Task<List<Topping>> GetToppingByIdsAsync(List<int> toppingIds);
+        Task<bool> CheckAndUpdateToppingStockAsync(List<Topping> toppings);
     }
 }

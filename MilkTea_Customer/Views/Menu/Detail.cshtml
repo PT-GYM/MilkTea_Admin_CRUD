@@ -19,7 +19,7 @@
             <form method="post" id="productForm">
                 <h4>Chọn tối đa 2 topping (không bắt buộc):</h4>
                 <div class="form-group">
-                    @foreach (var topping in toppings)
+                    @foreach (var topping in toppings.Distinct())
                     {
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input topping-checkbox" name="selectedToppings" value="@topping.ToppingId" id="topping_@topping.ToppingId">

@@ -7,6 +7,7 @@ namespace Services.Interface
     public interface IOrderDetailService
     {
         Task AddOrderDetail(OrderDetail orderDetail); 
-        Task<List<OrderDetail>> GetOrderDetailsByOrderId(int orderId);  
+        Task<List<OrderDetail>> GetOrderDetailsByOrderId(int orderId);
+        Task<Dictionary<string, string>> GetToppingDetailsByOrderIdAsync(int orderId);
     }
 }

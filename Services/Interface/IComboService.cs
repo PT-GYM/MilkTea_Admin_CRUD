@@ -9,5 +9,11 @@ namespace Services.Interface
 {
     public interface IComboService
     {
+        Task<IEnumerable<Combo>> GetAllCombos();
+        Task<Combo> GetComboById(int comboId);
+        Task<bool> DeleteCombo(int comboId);
+        Task<bool> AddCombo(Combo combo);
+        Task<IEnumerable<Product>> GetAllProductsAsync();
+        Task<IEnumerable<Topping>> GetAllToppingsAsync();
     }
 }

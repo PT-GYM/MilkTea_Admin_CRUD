@@ -28,7 +28,7 @@ namespace MilkTea_Admin_CRUD.Pages.OrderPage
         public async Task OnGetAsync()
         {
             Orders = await _orderService.GetAllOrdersSortedByDate();
-            OrderStatuses = await _orderService.GetOrderStatuses(); // Lấy từ code thay vì DB
+            OrderStatuses = await _orderService.GetOrderStatuses(); 
         }
 
         public async Task<IActionResult> OnPostAsync()

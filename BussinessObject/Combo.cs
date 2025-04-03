@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BussinessObject;
 
@@ -13,21 +14,17 @@ public partial class Combo
 
     public string? ImageUrl { get; set; }
 
-    public int? Product1Id { get; set; }
+    public string? Description { get; set; }
 
-    public int? Product2Id { get; set; }
+    public string ProductIds { get; set; } = null!;
 
-    public int? Topping1Id { get; set; }
-
-    public int? Topping2Id { get; set; }
+    public string? ToppingIds { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    public virtual Product? Product1 { get; set; }
+    [NotMapped] 
+    public List<string> ProductNames { get; set; }
 
-    public virtual Product? Product2 { get; set; }
-
-    public virtual Topping? Topping1 { get; set; }
-
-    public virtual Topping? Topping2 { get; set; }
+    [NotMapped]  
+    public List<string> ToppingNames { get; set; }
 }

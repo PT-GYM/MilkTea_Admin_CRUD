@@ -11,10 +11,17 @@ namespace Services.Service
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IProductService _productService;
+        private readonly IToppingService _toppingService;
+        private readonly IOrderDetailService _orderDetailService;
 
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, IProductService productService, IToppingService toppingService, IOrderDetailService orderDetailService )
         {
             _unitOfWork = unitOfWork;
+            _productService = productService;
+            _toppingService = toppingService;
+            _orderDetailService = orderDetailService;
+
         }
 
         public async Task CreateOrder(Order order, List<OrderDetail> orderDetails)
@@ -55,9 +62,10 @@ namespace Services.Service
 
         public async Task<List<Order>> GetAllOrdersSortedByDate()
         {
-            return (await _unitOfWork.order.GetAsync(null))
-                .OrderByDescending(o => o.OrderDate) 
-                .ToList();
+            return await _unitOfWork.order.Query()
+                .Include(o => o.User) 
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
         }
 
         public async Task<List<string>> GetOrderStatuses()
@@ -65,5 +73,69 @@ namespace Services.Service
             return await Task.FromResult(new List<string> { "Pending", "Confirmed", "Canceled" });
         }
 
+        public async Task<bool> ConfirmOrderAsync(string phoneNumber, string address, int productId, string toppingIds, int userId)
+        {
+            var product = await _productService.GetProductByIdAsync(productId);
+            if (product == null)
+            {
+                return false;  
+            }
+
+            List<Topping> toppings = new List<Topping>();
+            decimal toppingTotal = 0;
+
+            if (!string.IsNullOrEmpty(toppingIds))
+            {
+                var toppingIdList = toppingIds.Split(',')
+                                              .Select(id =>
+                                              {
+                                                  return int.TryParse(id, out int result) ? result : (int?)null;
+                                              })
+                                              .Where(id => id.HasValue)
+                                              .Select(id => id.Value)
+                                              .ToList();
+
+                toppings = await _toppingService.GetToppingByIdsAsync(toppingIdList);
+                toppingTotal = toppings.Sum(t => t.Price);
+            }
+
+            decimal totalAmount = product.Price + toppingTotal;
+
+            if (!await _productService.CheckAndUpdateProductStockAsync(product))
+            {
+                return false; 
+            }
+
+            if (!await _toppingService.CheckAndUpdateToppingStockAsync(toppings))
+            {
+                return false; 
+            }
+
+            var order = new Order
+            {
+                UserId = userId,
+                PhoneNumber = phoneNumber,
+                Address = address,
+                TotalAmount = totalAmount,
+                Status = "Pending",
+                OrderDate = DateTime.Now
+            };
+
+            var orderDetail = new OrderDetail
+            {
+                ProductId = productId,
+                ToppingIds = string.Join(",", toppings.Select(t => t.ToppingId)),
+                Quantity = 1,
+                SubTotal = product.Price + toppingTotal
+            };
+
+            await CreateOrder(order, new List<OrderDetail> { orderDetail });
+
+            return true; 
+        }
+
     }
 }
+
+
+

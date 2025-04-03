@@ -1,0 +1,48 @@
+﻿@page
+@model MilkTea_Admin_CRUD.Pages.Combos.IndexModel
+
+<h2>Combos</h2>
+
+<a href="/Combos/Create" class="btn btn-primary mb-3">Create New Combo</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Combo Name</th>
+            <th>Products</th>
+            <th>Toppings</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var combo in Model.Combos)
+        {
+            <tr>
+                <td>@combo.Name</td>
+                <td>
+                    @foreach (var productName in combo.ProductNames)
+                    {
+                        <div>@productName</div>
+                    }
+                </td>
+                <td>
+                    @foreach (var toppingName in combo.ToppingNames)
+                    {
+                        <div>@toppingName</div>
+                    }
+                </td>
+                <td>
+                    <form method="post" asp-page-handler="Delete" asp-route-comboId="@combo.ComboId" onsubmit="return confirmDelete()">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this combo?");
+    }
+</script>

@@ -1,0 +1,88 @@
+﻿@model BussinessObject.Combo
+
+@{
+    ViewData["Title"] = "Chi tiết Combo";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="@Model.Name">
+        </div>
+        <div class="col-md-6">
+            <h2>@Model.Name</h2>
+            <p><strong>Giá:</strong> @Model.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</p>
+            <p><strong>Sản phẩm:</strong> @string.Join(", ", Model.ProductNames)</p>
+            <p><strong>Topping:</strong> @string.Join(", ", Model.ToppingNames)</p>
+
+            <!-- Form để nhập thông tin thanh toán -->
+            <form method="post" id="comboForm">
+                <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#checkoutModal">Thanh toán</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for checkout -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkoutModalLabel">Thông tin đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="phoneNumber">Số điện thoại</label>
+                        <input type="text" class="form-control" id="phoneNumber" name="PhoneNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Địa chỉ</label>
+                        <input type="text" class="form-control" id="address" name="Address" required>
+                    </div>
+                    <input type="hidden" name="ComboId" value="@Model.ComboId">
+                    <input type="hidden" name="Price" value="@Model.Price">
+                    <button type="submit" class="btn btn-primary">Xác nhận thanh toán</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelector(".btn-primary.mt-3").addEventListener("click", function () {
+            $('#checkoutModal').modal('show');
+        });
+
+        document.getElementById("checkoutForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let phoneNumber = document.getElementById("phoneNumber").value;
+            let address = document.getElementById("address").value;
+            let comboId = document.querySelector("input[name='ComboId']").value;
+
+           
+            $.ajax({
+                type: "POST",
+                url: "/Menu/ConfirmOrder",  
+                data: {
+                    phoneNumber: phoneNumber,
+                    address: address,
+                    comboId: comboId
+                },
+                success: function (response) {
+                    alert("Đơn hàng đã được tạo thành công!");
+                    $('#checkoutModal').modal('hide');
+                },
+                error: function (error) {
+                    alert("Có lỗi xảy ra, vui lòng thử lại.");
+                }
+            });
+        });
+    });
+</script>

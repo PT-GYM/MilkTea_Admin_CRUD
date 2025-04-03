@@ -46,6 +46,33 @@ namespace Services.Service
             return orderDetails.ToList();
         }
 
+        public async Task<Dictionary<string, string>> GetToppingDetailsByOrderIdAsync(int orderId)
+        {
+            var orderDetails = await _unitOfWork.orderDetail.GetAsync(
+                od => od.OrderId == orderId,
+                includeProperties: "Product"
+            );
 
+            var toppingDetailsDict = new Dictionary<string, string>();
+
+            foreach (var detail in orderDetails)
+            {
+                if (!string.IsNullOrEmpty(detail.ToppingIds))
+                {
+                    var toppingIdList = detail.ToppingIds.Split(',')
+                        .Select(id => int.TryParse(id, out int tid) ? tid : (int?)null)
+                        .Where(id => id.HasValue)
+                        .Select(id => id.Value)
+                        .ToList();
+
+                    var toppings = await _unitOfWork.topping.GetAsync(t => toppingIdList.Contains(t.ToppingId));
+                    var toppingDetails = string.Join(", ", toppings.Select(t => $"{t.Name} ({t.Price:N0} VND)"));
+
+                    toppingDetailsDict[detail.ToppingIds] = toppingDetails;
+                }
+            }
+
+            return toppingDetailsDict;
+        }
     }
 }

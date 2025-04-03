@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BussinessObject;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 
@@ -39,6 +40,38 @@ namespace MilkTea_Customer.Controllers
             HttpContext.Session.SetInt32("UserId", user.UserId);
 
             return RedirectToAction("Show", "Menu");
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(string Username, string Password, string ConfirmPassword)
+        {
+            if (Password != ConfirmPassword)
+            {
+                ViewBag.ErrorMessage = "Passwords do not match.";
+                return View();
+            }
+
+            var newUser = new User
+            {
+                Username = Username,
+                Password = Password,
+                Role = "Customer"
+            };
+
+            var success = await _accountService.Register(newUser);
+            if (!success)
+            {
+                ViewBag.ErrorMessage = "Username already exists.";
+                return View();
+            }
+
+            return RedirectToAction("Login");
         }
     }
 }

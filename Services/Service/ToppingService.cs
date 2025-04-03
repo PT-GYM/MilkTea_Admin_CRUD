@@ -75,5 +75,20 @@ namespace Services.Service
             _unitOfWork.topping.Delete(topping);
             await _unitOfWork.SaveAsync();
         }
+
+        public async Task<bool> CheckAndUpdateToppingStockAsync(List<Topping> toppings)
+        {
+            foreach (var topping in toppings)
+            {
+                if (topping.Stock <= 0)
+                {
+                    return false; 
+                }
+
+                topping.Stock -= 1; 
+                await UpdateToppingAsync(topping);
+            }
+            return true;
+        }
     }
 }

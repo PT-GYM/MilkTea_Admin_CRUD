@@ -14,5 +14,7 @@ namespace Services.Interface
         Task AddProductAsync(Product product);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(int id);
+        Task<List<Product>> GetProductByIdsAsync(List<int> productIds);
+        Task<bool> CheckAndUpdateProductStockAsync(Product product, int quantity = 1);
     }
 }

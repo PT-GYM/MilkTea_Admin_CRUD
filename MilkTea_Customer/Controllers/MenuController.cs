@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Azure.Core.HttpHeader;
 
 namespace MilkTea_Customer.Controllers
 {
@@ -16,6 +17,7 @@ namespace MilkTea_Customer.Controllers
         private readonly IToppingService _toppingService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly ICategoryService _categoryService;
+        private readonly IComboService _comboService;
         private const int PageSize = 3;
 
         public MenuController(
@@ -23,13 +25,15 @@ namespace MilkTea_Customer.Controllers
             IProductService productService,
             IToppingService toppingService,
             IOrderDetailService orderDetailService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IComboService comboService)
         {
             _orderService = orderService;
             _productService = productService;
             _toppingService = toppingService;
             _orderDetailService = orderDetailService;
             _categoryService = categoryService;
+            _comboService = comboService;
         }
 
         public async Task<IActionResult> Show(string searchKeyword, int? categoryId, int pageNumber = 1)
@@ -57,6 +61,8 @@ namespace MilkTea_Customer.Controllers
 
             var categories = await _categoryService.GetCategories();
             ViewBag.Categories = categories;
+            var combos = await _comboService.GetAllCombos();
+            ViewBag.Combos = combos;
 
             return View(products);
         }
@@ -73,94 +79,34 @@ namespace MilkTea_Customer.Controllers
             if (product == null) return NotFound();
 
             var toppings = await _toppingService.GetAllToppingsAsync();
+            if (toppings == null)
+            {
+                toppings = new List<Topping>(); 
+            }
 
             ViewBag.Toppings = toppings;
 
             return View(product);
         }
 
-        [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> ConfirmOrder(string phoneNumber, string address, int productId, string toppingIds)
         {
-            var product = await _productService.GetProductByIdAsync(productId);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            List<Topping> toppings = new List<Topping>();
-            decimal toppingTotal = 0;
+            bool success = await _orderService.ConfirmOrderAsync(phoneNumber, address, productId, toppingIds, userId.Value);
 
-            if (!string.IsNullOrEmpty(toppingIds))
+            if (success)
             {
-                var toppingIdList = toppingIds.Split(',')
-                                              .Select(id =>
-                                              {
-                                                  return int.TryParse(id, out int result) ? result : (int?)null;
-                                              })
-                                              .Where(id => id.HasValue)
-                                              .Select(id => id.Value)
-                                              .ToList();
-
-                toppings = await _toppingService.GetToppingByIdsAsync(toppingIdList);
-                toppingTotal = toppings.Sum(t => t.Price);
+                return RedirectToAction("OrderConfirmation");
             }
 
-            decimal totalAmount = product.Price + toppingTotal;
-
-            // Trừ stock của sản phẩm
-            if (product.Stock <= 0)
-            {
-                return BadRequest("Sản phẩm đã hết hàng");
-            }
-            product.Stock -= 1;  // Giảm 1 đơn vị sản phẩm
-
-            // Trừ stock của topping
-            foreach (var topping in toppings)
-            {
-                if (topping.Stock <= 0)
-                {
-                    return BadRequest($"Topping {topping.Name} đã hết hàng");
-                }
-                topping.Stock -= 1;  // Giảm 1 đơn vị topping
-            }
-
-            // Lưu lại thông tin vào DB
-            await _productService.UpdateProductAsync(product); // Cập nhật stock sản phẩm
-            foreach (var topping in toppings)
-            {
-                await _toppingService.UpdateToppingAsync(topping); // Cập nhật stock topping
-            }
-
-            var order = new Order
-            {
-                UserId = userId.Value,
-                PhoneNumber = phoneNumber,
-                Address = address,
-                TotalAmount = totalAmount,
-                Status = "Pending",
-                OrderDate = DateTime.Now
-            };
-
-            var orderDetail = new OrderDetail
-            {
-                ProductId = productId,
-                ToppingIds = string.Join(",", toppings.Select(t => t.ToppingId)),
-                Quantity = 1,
-                SubTotal = product.Price + toppingTotal
-            };
-
-            await _orderService.CreateOrder(order, new List<OrderDetail> { orderDetail });
-
-            return RedirectToAction("OrderConfirmation");
+            return BadRequest("Có lỗi xảy ra khi xử lý đơn hàng, vui lòng thử lại.");
         }
+
 
         public async Task<IActionResult> OrderConfirmation()
         {
@@ -193,29 +139,21 @@ namespace MilkTea_Customer.Controllers
                 return NotFound();
             }
 
-            var toppingDetailsDict = new Dictionary<string, string>();
-
-            foreach (var detail in orderDetails)
-            {
-                if (!string.IsNullOrEmpty(detail.ToppingIds))
-                {
-                    var toppingIdList = detail.ToppingIds.Split(',')
-                        .Select(id => int.TryParse(id, out int tid) ? tid : (int?)null)
-                        .Where(id => id.HasValue)
-                        .Select(id => id.Value)
-                        .ToList();
-
-                    var toppings = await _toppingService.GetToppingByIdsAsync(toppingIdList);
-                    var toppingDetails = string.Join(", ", toppings.Select(t => $"{t.Name} ({t.Price:N0} VND)"));
-
-                    toppingDetailsDict[detail.ToppingIds] = toppingDetails;
-                }
-            }
+            var toppingDetailsDict = await _orderDetailService.GetToppingDetailsByOrderIdAsync(orderId);
 
             ViewBag.ToppingDetails = toppingDetailsDict;
 
             return View(orderDetails);
         }
+        public async Task<IActionResult> ShowComboDetail(int comboId)
+        {
+            var combo = await _comboService.GetComboById(comboId);
+            if (combo == null)
+            {
+                return NotFound();
+            }
 
+            return View("ComboDetail", combo);
+        }
     }
 }

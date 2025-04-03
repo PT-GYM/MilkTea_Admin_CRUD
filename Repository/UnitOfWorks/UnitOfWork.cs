@@ -21,8 +21,8 @@ namespace Repository.UnitOfWorks
         public IGenericRepository<Category> category { get; }
 
         public IGenericRepository<Order> order { get; }
-
         public IGenericRepository<OrderDetail> orderDetail { get; }
+
 
         public UnitOfWork(MilkTeaShopContext context)
         {

@@ -31,9 +31,29 @@
     </div>
 </form>
 
-
-
 <div class="container">
+    <!-- Hiển thị Combo -->
+    <h3>Combo</h3>
+    <div class="row mb-4">
+        @foreach (var combo in ViewBag.Combos)
+        {
+            <div class="col-md-4 mb-4">
+                <a href="@Url.Action("ShowComboDetail", "Menu", new { comboId = combo.ComboId })" class="text-decoration-none text-dark">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@combo.Name</h5>
+                        <p class="card-text">Sản phẩm: @string.Join(", ", combo.ProductNames)</p>
+                        <p class="card-text">Topping: @string.Join(", ", combo.ToppingNames)</p>
+                        <p class="card-text font-weight-bold">Giá: @combo.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</p>
+                    </div>
+                </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Hiển thị Sản phẩm -->
+    <h3>Sản phẩm</h3>
     <div class="row">
         @foreach (var product in Model)
         {
@@ -49,18 +69,22 @@
                 </a>
             </div>
         }
-    </div
+    </div>
 
-<nav>
-    <ul class="pagination justify-content-center mt-4">
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                <a class="page-link" href="@Url.Action("Show", new { pageNumber = i, searchKeyword = ViewBag.SearchKeyword, categoryId = ViewBag.SearchCategory })">@i</a>
-            </li>
-        }
-    </ul>
-</nav>
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination justify-content-center mt-4">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Show", new { pageNumber = i, searchKeyword = ViewBag.SearchKeyword, categoryId = ViewBag.SelectedCategory })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script>
     var connection = new signalR.HubConnectionBuilder()

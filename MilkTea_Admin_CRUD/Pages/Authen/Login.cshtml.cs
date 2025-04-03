@@ -54,7 +54,7 @@ namespace MilkTea_Admin_CRUD.Pages.Authen
                 return Page();
             }
 
-            HttpContext.Session.SetString("UserEmail", acc.Username);
+            HttpContext.Session.SetString("Username", acc.Username);
             HttpContext.Session.SetString("Role", acc.Role);
 
 
