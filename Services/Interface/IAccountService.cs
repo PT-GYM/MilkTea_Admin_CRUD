@@ -10,7 +10,7 @@ namespace Services.Interface
     public interface IAccountService
     {
         Task<User> Login(string username, string password);
-        Task<bool> Register(User user);
+        Task<bool> Register(string username, string password);
     }
 }
 

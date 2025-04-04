@@ -21,20 +21,33 @@ namespace Services.Service
                 .FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
         }
 
-        public async Task<bool> Register(User user)
+        public Task<User> Login(string username, string password, string confirmPassword)
         {
-           
-            var existingUser = await _unitOfWork.account.Query()
-                .AnyAsync(x => x.Username == user.Username);
+            throw new NotImplementedException();
+        }
 
-            if (existingUser)
+        public async Task<bool> Register(string username, string password)
+        {
+            var exists = await _unitOfWork.account.Query()
+                .AnyAsync(u => u.Username == username);
+
+            if (exists)
             {
                 return false;
             }
 
-            await _unitOfWork.account.AddAsync(user);
+            var newUser = new User
+            {
+                Username = username,
+                Password = password,
+                Role = "Customer"
+            };
+
+            await _unitOfWork.account.AddAsync(newUser);
             await _unitOfWork.SaveAsync();
             return true;
         }
+
+
     }
 }

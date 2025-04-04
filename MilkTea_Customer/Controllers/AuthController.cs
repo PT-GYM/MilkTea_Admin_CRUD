@@ -57,14 +57,7 @@ namespace MilkTea_Customer.Controllers
                 return View();
             }
 
-            var newUser = new User
-            {
-                Username = Username,
-                Password = Password,
-                Role = "Customer"
-            };
-
-            var success = await _accountService.Register(newUser);
+            var success = await _accountService.Register(Username, Password); 
             if (!success)
             {
                 ViewBag.ErrorMessage = "Username already exists.";
@@ -73,5 +66,6 @@ namespace MilkTea_Customer.Controllers
 
             return RedirectToAction("Login");
         }
+
     }
 }
